@@ -1,34 +1,37 @@
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import { Link, useNavigate} from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Cookie from 'js-cookie'
-
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import { Link, useNavigate } from "react-router-dom";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Cookie from "js-cookie";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../store/auth.js";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const body = {
-      email: data.get('email'),
-      password: data.get('password'),
-    }
-    const res = await fetch(process.env.REACT_APP_API_URL + '/auth/login', {
+      email: data.get("email"),
+      password: data.get("password"),
+    };
+    const res = await fetch(process.env.REACT_APP_API_URL + "/auth/login", {
       method: "POST",
       body: JSON.stringify(body),
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      }
-    })
-    const { token } = await res.json();
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    const { user, token } = await res.json();
     if (res.ok) {
-      Cookie.set('token', token)
-      navigate('/')
+      Cookie.set("token", token);
+      dispatch(setUser({ user }));
+      navigate("/");
     }
   };
 

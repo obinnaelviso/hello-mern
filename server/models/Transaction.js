@@ -2,10 +2,12 @@ import mongoose from "mongoose"
 const { Schema } = mongoose
 
 const transactionSchema = new Schema({
+  user_id: mongoose.Types.ObjectId,
+  category_id: mongoose.Types.ObjectId,
   amount: Number,
   description: String,
-  date: { type: Date, default: new Date()},
-  createdAt: { type: Date, default: Date.now }
-})
+  date: { type: Date, default: new Date() },
+  createdAt: { type: Date, default: Date.now },
+});
 
 export default new mongoose.model("Transaction", transactionSchema);

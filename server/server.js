@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import TransactionController from "./controllers/TransactionController.js";
-import AuthController from "./controllers/AuthController.js";
+import routes from "./routes/index.js";
 import connect from "./database/mongodb.js";
 import passport from "passport";
 import passportConfig from "./config/passport.js";
@@ -16,13 +15,8 @@ const PORT = 4000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(passport.initialize());
+app.use("/", routes);
 passportConfig(passport);
-app.use("/transactions", TransactionController);
-app.use("/auth", AuthController);
-// app.use(function (req, res) {
-//   res.setHeader('Accept', 'application/json')
-//   res.end
-// })
 connect();
 
 app.listen(PORT, () => {

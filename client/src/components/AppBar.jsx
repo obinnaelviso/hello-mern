@@ -1,14 +1,18 @@
 import * as React from "react";
 import { AppBar, Box, Toolbar, Typography, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import Cookie from "js-cookie"
+import Cookie from "js-cookie";
+import { removeUser } from "../store/auth.js";
+import { useDispatch } from "react-redux";
 
 export default function ButtonAppBar() {
   const navigate = useNavigate();
-  
+  const dispatch = useDispatch();
+
   function logout() {
-    Cookie.remove('token')
-    navigate("/login")
+    Cookie.remove("token");
+    dispatch(removeUser());
+    navigate("/login");
   }
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -20,8 +24,8 @@ export default function ButtonAppBar() {
             </Link>
           </Typography>
           <Button color="inherit">
-            <Link to="/login" className="text-white">
-              Login
+            <Link className="text-white" to="/categories">
+              Categories
             </Link>
           </Button>
           <Button color="inherit" onClick={logout}>

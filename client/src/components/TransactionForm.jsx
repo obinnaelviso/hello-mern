@@ -1,30 +1,40 @@
-import * as React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import { Button, Autocomplete, Box } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Stack } from "@mui/material";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import Cookie from "js-cookie";
 
 export default function TransactionForm({
   fetchTransactions,
   editTransaction,
   setEditTransaction,
 }) {
+  const token = Cookie.get("token");
+  const { categories } = useSelector((state) => state.auth.user);
   const initialForm = {
     amount: 0,
     description: "",
     date: new Date(),
+    category_id: "",
   };
+  const [form, setForm] = useState(initialForm);
+
   useEffect(() => {
     if (editTransaction.amount !== undefined) setForm(editTransaction);
   }, [editTransaction]);
 
-  const [form, setForm] = useState(initialForm);
+  function getCategoryById() {
+    return (
+      categories.find((category) => category._id === form.category_id) ?? ""
+    );
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -44,6 +54,7 @@ export default function TransactionForm({
       headers: {
         "content-type": "application/json",
         accept: "application/json",
+        authorization: "Bearer " + token,
       },
     });
   }
@@ -57,6 +68,7 @@ export default function TransactionForm({
         headers: {
           "content-type": "application/json",
           accept: "application/json",
+          authorization: "Bearer " + token,
         },
       }
     );
@@ -80,7 +92,7 @@ export default function TransactionForm({
   return (
     <Card sx={{ minWidth: 275, marginTop: 10 }}>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit}>
           <Stack spacing={2}>
             <Typography variant="h6">Add Transaction</Typography>
             <Stack direction="row" spacing={2}>
@@ -113,6 +125,26 @@ export default function TransactionForm({
                   )}
                 />
               </LocalizationProvider>
+              <Autocomplete
+                value={getCategoryById()}
+                isOptionEqualToValue={(option, value) =>
+                  value === undefined ||
+                  value === "" ||
+                  option._id === value._id
+                }
+                onChange={(event, newValue) => {
+                  setForm({
+                    ...form,
+                    category_id: newValue._id,
+                  });
+                }}
+                id="controllable-states-demo"
+                options={categories}
+                sx={{ width: 200 }}
+                renderInput={(params) => (
+                  <TextField {...params} size="small" label="Category" />
+                )}
+              />
               {editTransaction.amount === undefined ? (
                 <Button type="submit" variant="contained">
                   Add
@@ -124,7 +156,7 @@ export default function TransactionForm({
               )}
             </Stack>
           </Stack>
-        </form>
+        </Box>
       </CardContent>
     </Card>
   );

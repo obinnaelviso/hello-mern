@@ -1,15 +1,19 @@
-import { Router } from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const router = Router();
-
-router.post("/register", async (req, res) => {
+export const register = async (req, res) => {
   const { email, password, firstName, lastName } = req.body;
   const userExists = await User.findOne({ email });
+  const categories = [
+    { label: "Travel", icon: "user" },
+    { label: "Fun", icon: "user" },
+    { label: "Work", icon: "user" },
+    { label: "Home", icon: "user" },
+    { label: "Transport", icon: "user" },
+  ];
   if (userExists) {
-    res.status(422).json({ message: "User already exists" });
+    res.status(422).json({ message: "User already exists", icon: "user" });
     return;
   } else {
     const salt = bcrypt.genSaltSync(10);
@@ -19,13 +23,14 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       firstName,
       lastName,
+      categories,
     });
     await user.save();
     res.status(201).json({ message: "User registered successfully!" });
   }
-});
+};
 
-router.post("/login", async (req, res) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
@@ -44,6 +49,4 @@ router.post("/login", async (req, res) => {
   };
   const token = jwt.sign(payload, process.env.JWT_SECRET);
   res.json({ message: "Login successful!", token });
-});
-
-export default router;
+};

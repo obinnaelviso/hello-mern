@@ -6,6 +6,7 @@ async function connect() {
   const mongodb = await mongoose.connect(
     `mongodb+srv://${username}:${password}@${url}/?retryWrites=true&w=majority`
   );
+  console.log("Database connection successful");
 }
 
 export default connect;
